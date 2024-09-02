@@ -62,11 +62,6 @@ body.light-theme .button {
   color: #007bff;
 } 
 
-.button.is-text { 
-  font-size: 24px; 
-  font-weight: 500;  
-  text-decoration: none;
-}
   
 .button.is-text:hover {
     color: #007bff; 
