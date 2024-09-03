@@ -79,3 +79,20 @@ function stopScreenshots() {
 
 document.getElementById('startButton').addEventListener('click', takeScreenshot);
 document.getElementById('stopButton').addEventListener('click', stopScreenshots);
+
+
+
+
+// Forma    
+// const signInButton = document.getElementById("signInButton");
+// const signOutButton = document.getElementById("signOutButton");
+// const message = document.getElementById("message");
+
+// // Сховати кнопку виходу та повідомлення спочатку
+// signOutButton.style.display = "none";
+// message.style.display = "none";
+
+// const userSignIn = async => { 
+//   signInWithPropup(auth,)
+// }
+
