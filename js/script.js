@@ -83,16 +83,64 @@ document.getElementById('stopButton').addEventListener('click', stopScreenshots)
 
 
 
-// Forma    
-// const signInButton = document.getElementById("signInButton");
-// const signOutButton = document.getElementById("signOutButton");
-// const message = document.getElementById("message");
 
-// // Сховати кнопку виходу та повідомлення спочатку
-// signOutButton.style.display = "none";
-// message.style.display = "none";
 
-// const userSignIn = async => { 
-//   signInWithPropup(auth,)
-// }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
+// Ваші конфігурації Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAcVk5A6uypL5YcaRQpPQblTkYkeovX9oQ",
+  authDomain: "screenshot-time-d3455.firebaseapp.com",
+  projectId: "screenshot-time-d3455",
+  storageBucket: "screenshot-time-d3455.appspot.com",
+  messagingSenderId: "482205183848",
+  appId: "1:482205183848:web:ea2935d5e02afe8e7e30dd"
+};
+
+// Ініціалізація Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+
+const signInButton = document.getElementById("signInButton");
+const signOutButton = document.getElementById("signOutButton");
+const message = document.getElementById("message");
+const userName = document.getElementById("userName");
+const userEmail = document.getElementById("userEmail");
+
+// Сховати кнопку виходу та повідомлення спочатку
+signOutButton.style.display = "none";
+message.style.display = "none";
+const userSignIn = async => {
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user
+      console.log(user);
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message
+    })
+}
+
+const userSignOut = async () => {
+  signOut(auth).then(() => {
+    alert("ви вийшли з системи успішно!")
+  }).catch((error) => { })
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    signOutButton.style.display = "block";
+    message.style.display = "block";
+    userName.innerHTML = user.displayName;
+    userEmail.innerHTML = user.email
+  } else {
+    signOutButton.style.display = "none";
+    message.style.display = "none";
+
+  }
+})
+
+signInButton.addEventListener("click", userSignIn);
+signOutButton.addEventListener('click', userSignOut);
