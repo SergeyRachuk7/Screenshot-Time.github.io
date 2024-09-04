@@ -18,14 +18,21 @@
 </head>
 
 <body class="dark-theme">
-
-  <button id="signInButton">Створити обліковий запис / Увійти</button>
-  <button id="signOutButton">Вийти</button>
-  <div id="message">
-    <p>Ви ввійшли в систему <span id="userName"> <span id="userEmail">з помічю електроной почти email </span> </span>
-    </p>
-  </div>
   <div class="box is-narrow-desktop">
+    <div class="authenticator ml-4">
+      <div class="authenticator__in">
+        <button id="signInButton" class="button is-info  is-link is-outlined">обліковий запис
+          Увійти</button>
+      </div>
+      <div class="authenticator__out">
+        <button id="signOutButton" class="button button-out">Вийти</button>
+      </div>
+    </div>
+    <div id="message">
+      <p>Ви ввійшли в систему <span id="userName"> <span id="userEmail">з помічю електроной почти email </span> </span>
+        <span id="userText">ви вийшли з системи успішно!</span>
+      </p>
+    </div>
     <div class="nav">
       <div class="nav__inner">
         <h1 class="mr-4 title">
@@ -35,7 +42,6 @@
         </h1>
         <div class="buttons are-small">
           <button id="themeToggle" class="button is-info is-outlined is-rounded">Перемикання теми</button>
-
         </div>
       </div>
       <div class="has-text-centered">
