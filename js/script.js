@@ -163,3 +163,40 @@ document.getElementById('startButton').addEventListener('click', takeScreenshot)
 document.getElementById('stopButton').addEventListener('click', stopScreenshots);
 
 
+
+
+
+
+const buttonCapture = document.querySelector(`button#capture`);
+
+
+buttonCapture.addEventListener(`click`, (event) => {
+  navigator.mediaDevices.getDisplayMedia({ video: true }) // Просим у пользователя разрешения снимки экрана
+    .then((stream) => { // Если разрешает
+      const video = document.createElement(`video`); // Создаем видео
+      video.srcObject = stream; // В видео передаем поток экрана
+      video.autoplay = true; // Автозапуск включаем
+      video.addEventListener(`play`, (event) => { // Когда видео начнет играть
+        const canvas = document.createElement(`canvas`); // Создаем холст
+        canvas.width = video.videoWidth; // Задаем ширину
+        canvas.height = video.videoHeight; // Задаем высоту
+        const context = canvas.getContext(`2d`); // Берем контекст
+        if (!context) { // Если контекст не береться
+          throw new ReferenceError(`Element 'context' isn't defined.`); // Кидаем в ошибку
+        }
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight); // Рисуем на холсте кадр из видео
+        const a = document.createElement(`a`); // Создаем якорь
+        a.download = `${new Date().toLocaleString()}.png`; // Делаем якорь для скачивая
+        a.href = canvas.toDataURL(); // Передаем данные холста в якорь
+        a.click(); // Активируем якорь (скачиваем)
+        URL.revokeObjectURL(a.href); // Удаляем ненужную ссылку
+        a.remove(); // Удаляем якорь
+        canvas.remove(); // Удаляем холст
+        video.remove(); // Удаляем видео
+        stream.getTracks().forEach(track => track.stop()); // Отключаем потоки для захвата экрана
+      });
+    })
+    .catch((reason) => { // Если не разрешает или падает в ошибку
+      console.error(reason instanceof Error ? reason : new Error(reason)); // Выводим ошибку на консоль
+    });
+});
